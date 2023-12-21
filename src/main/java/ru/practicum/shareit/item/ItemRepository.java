@@ -49,7 +49,6 @@ public class ItemRepository {
             log.info("зашли в if ");
             return null;
         }
-
         log.info("вышли из if");
         return storageItems.get(itemId);
     }
