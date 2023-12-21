@@ -82,7 +82,7 @@ public class ItemSrviceImpl implements ItemService {
     public List<ItemDto> getListItemsByIdUser(long userId) {
         return itemRepository.getStorageItem().stream()
                 .filter(item -> item.getOwner().equals(userId))
-                .map(itemMapping :: mapToItemDto)
+                .map(itemMapping::mapToItemDto)
                 .collect(Collectors.toList());
     }
 
@@ -95,7 +95,7 @@ public class ItemSrviceImpl implements ItemService {
         return itemRepository.getStorageItem().stream()
                 .filter(item -> item.getDescription().toLowerCase().contains(text.toLowerCase()) &&
                         item.getAvailable().equals(true))
-                .map(itemMapping :: mapToItemDto)
+                .map(itemMapping::mapToItemDto)
                 .collect(Collectors.toList());
     }
 
