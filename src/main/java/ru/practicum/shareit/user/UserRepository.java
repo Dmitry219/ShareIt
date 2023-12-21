@@ -15,11 +15,11 @@ public class UserRepository {
     private final Map<Long, User> storageUser = new HashMap<>();
     private long generateId = 0;
 
-    private long getGenerateId(){
+    private long getGenerateId() {
         return ++generateId;
     }
 
-    public User createUser(User user){
+    public User createUser(User user) {
         user.setId(getGenerateId());
         storageUser.put(user.getId(), user);
         return user;
@@ -29,22 +29,20 @@ public class UserRepository {
         return storageUser.values();
     }
 
-    public User updateUser(User user){
+    public User updateUser(User user) {
         log.info("Проверка репозитория метод updateUser user{}", user);
-
-        if(!storageUser.containsKey(user.getId())){
+        if (!storageUser.containsKey(user.getId())){
             return null;
         }
-
         storageUser.put(user.getId(), user);
         return user;
     }
 
-    public User getByIdUser(long userId){
+    public User getByIdUser(long userId) {
         return storageUser.get(userId);
     }
 
-    public  void deleteUserById(long userId){
+    public  void deleteUserById(long userId) {
         storageUser.remove(userId);
     }
 }

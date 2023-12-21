@@ -4,7 +4,6 @@ import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 import ru.practicum.shareit.item.model.Item;
-import ru.practicum.shareit.user.User;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -17,7 +16,7 @@ public class ItemRepository {
     private final Map<Long, Item> storageItems = new HashMap<>();
     private long generateId = 0;
 
-    private long getGenerateId(){
+    private long getGenerateId() {
         return ++generateId;
     }
 
@@ -25,15 +24,16 @@ public class ItemRepository {
         return storageItems.values();
     }
 
-    public Item createItem(Item item){
+    public Item createItem(Item item) {
         item.setId(getGenerateId());
         storageItems.put(item.getId(), item);
         return item;
     }
 
-    public Item updateItem(Item item, long itemId,long userId){
+    public Item updateItem(Item item, long itemId,long userId) {
         log.info("Проверка метод updateItem storageItems{}", getStorageItems());
-        if (!storageItems.containsKey(itemId)){
+
+        if (!storageItems.containsKey(itemId)) {
             return null;
         }
 
@@ -41,21 +41,24 @@ public class ItemRepository {
         return item;
     }
 
-    public Item getByIdItem(Long itemId){
+    public Item getByIdItem(Long itemId) {
         log.info("Проверка репозитория метод getItemById itemId {}", itemId);
         log.info("Проверка репозитория метод getItemById storageItems {}", storageItems.get(itemId));
-        if(!storageItems.containsKey(itemId)){
+
+        if (!storageItems.containsKey(itemId)) {
             log.info("зашли в if ");
             return null;
         }
+
         log.info("вышли из if");
         return storageItems.get(itemId);
     }
 
-    public void deleteItem(long itemId){
-        if(storageItems.containsKey(itemId)){
+    public void deleteItem(long itemId) {
+        if (storageItems.containsKey(itemId)) {
             return;
         }
+
         storageItems.remove(itemId);
     }
 

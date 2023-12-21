@@ -17,10 +17,11 @@ import java.util.stream.Collectors;
 
 @Service
 @Slf4j
-public class ItemSrviceImpl implements ItemService{
+public class ItemSrviceImpl implements ItemService {
     private final UserRepository userRepository;
     private final ItemRepository itemRepository;
     private final ItemMapping itemMapping;
+
     @Autowired
     public ItemSrviceImpl(UserRepository userRepository, ItemRepository itemRepository, ItemMapping itemMapping) {
         this.userRepository = userRepository;
@@ -29,7 +30,7 @@ public class ItemSrviceImpl implements ItemService{
     }
 
     @Override
-    public ItemDto createItem(ItemDto itemDto, long userId){
+    public ItemDto createItem(ItemDto itemDto, long userId) {
         log.info("Проверка сервис метод createItem itemDto {}", itemDto);
         log.info("Проверка сервис метод createItem item {}", userId);
         Item item = itemMapping.mapToItem(itemDto);
@@ -42,7 +43,7 @@ public class ItemSrviceImpl implements ItemService{
     }
 
     @Override
-    public ItemDto updateItem(ItemDto itemDto, long itemId, long userId){
+    public ItemDto updateItem(ItemDto itemDto, long itemId, long userId) {
         log.info("Проверка сервис метод updateItem itemDto {}", itemDto);
         log.info("Проверка сервис метод updateItem itemId {}", itemId);
         log.info("Проверка сервис метод updateItem userId {}", userId);
@@ -55,13 +56,13 @@ public class ItemSrviceImpl implements ItemService{
 
         Item item = itemMapping.mapToItem(itemDto);
         Item newItem = itemRepository.getByIdItem(itemId);
-        if(item.getName() != null){
+        if (item.getName() != null) {
             newItem.setName(item.getName());
         }
-        if(item.getDescription() != null){
+        if (item.getDescription() != null) {
             newItem.setDescription(item.getDescription());
         }
-        if(item.getAvailable() != null){
+        if (item.getAvailable() != null) {
             newItem.setAvailable(item.getAvailable());
         }
 
@@ -73,12 +74,12 @@ public class ItemSrviceImpl implements ItemService{
     }
 
     @Override
-    public ItemDto getByIdItem(long itemId){
+    public ItemDto getByIdItem(long itemId) {
        return itemMapping.mapToItemDto(itemRepository.getByIdItem(itemId));
     }
 
     @Override
-    public List<ItemDto> getListItemsByIdUser(long userId){
+    public List<ItemDto> getListItemsByIdUser(long userId) {
         return itemRepository.getStorageItem().stream()
                 .filter(item -> item.getOwner().equals(userId))
                 .map(itemMapping :: mapToItemDto )
@@ -86,9 +87,9 @@ public class ItemSrviceImpl implements ItemService{
     }
 
     @Override
-    public List<ItemDto> getListItemsByText(String text, long userId){
+    public List<ItemDto> getListItemsByText(String text, long userId) {
         log.info("Проверка сервис метод getListItemsByText проверка text {} , userId {}", text, userId);
-        if(text.isBlank()){
+        if (text.isBlank()) {
             return new ArrayList<>();
         }
         return itemRepository.getStorageItem().stream()
@@ -118,7 +119,7 @@ public class ItemSrviceImpl implements ItemService{
 
     private void checkIdOwnerItem(long itemId, long userId) {
         log.info("Проверка сервис метод checkIdOwnerItem проверка владельца");
-        if(itemRepository.getByIdItem(itemId).getOwner() != userId){
+        if (itemRepository.getByIdItem(itemId).getOwner() != userId) {
             throw new AuthorizationFailureException("Вещь с таким ID имеет владельца!");
         }
     }

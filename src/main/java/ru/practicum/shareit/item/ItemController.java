@@ -22,7 +22,7 @@ public class ItemController {
 
     @PostMapping
     public ItemDto createItem(@Valid @RequestBody ItemDto itemDto,
-                           @RequestHeader(value = "X-Sharer-User-Id") long userId){
+                           @RequestHeader(value = "X-Sharer-User-Id") long userId) {
         log.info("Проверка контроллер метод createItem itemDto {}", itemDto);
         log.info("Проверка контроллер метод createItem userId {}", userId);
 
@@ -32,7 +32,7 @@ public class ItemController {
     @PatchMapping("/{itemId}")
     public ItemDto updateItem(@RequestBody ItemDto itemDto,
                               @PathVariable long itemId,
-                              @RequestHeader("X-Sharer-User-Id") long userId){
+                              @RequestHeader("X-Sharer-User-Id") long userId) {
         log.info("Проверка контроллер метод updateItem itemDto {}", itemDto);
         log.info("Проверка контроллер метод updateItem itemId {}", itemId);
         log.info("Проверка контроллер метод updateItem userId {}", userId);
@@ -42,18 +42,18 @@ public class ItemController {
     }
 
     @GetMapping("/{itemId}")
-    public ItemDto getItemById(@PathVariable long itemId){
+    public ItemDto getItemById(@PathVariable long itemId) {
         return itemService.getByIdItem(itemId);
     }
 
     @GetMapping
-    public List<ItemDto> getListItemsByIdUser(@RequestHeader("X-Sharer-User-Id") long userId){
+    public List<ItemDto> getListItemsByIdUser(@RequestHeader("X-Sharer-User-Id") long userId) {
         return itemService.getListItemsByIdUser(userId);
     }
 
     @GetMapping("/search")
     public List<ItemDto> getListItemsByText(@RequestParam String text,
-                                            @RequestHeader("X-Sharer-User-Id") long userId){
+                                            @RequestHeader("X-Sharer-User-Id") long userId) {
         return itemService.getListItemsByText(text, userId);
     }
 }

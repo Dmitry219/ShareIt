@@ -7,15 +7,7 @@ import ru.practicum.shareit.item.model.Item;
 @Service
 public class ItemMapping {
     //из entity в dto
-    public ItemDto mapToItemDto(Item item){
-//        ItemDto itemDto = new ItemDto();
-//
-//        itemDto.setId(item.getId());
-//        itemDto.setName(item.getName());
-//        //itemDto.setOwner(item.getOwner());
-//        //itemDto.setRequest(item.getRequest());
-//        itemDto.setAvailable(item.isAvailable());
-//        itemDto.setDescription(item.getDescription());
+    public ItemDto mapToItemDto(Item item) {
 
         return ItemDto.builder()
                 .id(item.getId())
@@ -25,15 +17,7 @@ public class ItemMapping {
                 .build();
     }
 
-    public Item mapToItem(ItemDto itemDto){
-//        Item item =new Item();
-//
-//        item.setId(itemDto.getId());
-//        item.setName(itemDto.getName());
-//        //item.setOwner(itemDto.getOwner());
-//        //item.setRequest(itemDto.getRequest());
-//        item.setAvailable(itemDto.getAvailable());
-//        item.setDescription(itemDto.getDescription());
+    public Item mapToItem(ItemDto itemDto) {
 
         return Item.builder()
                 .id(itemDto.getId())

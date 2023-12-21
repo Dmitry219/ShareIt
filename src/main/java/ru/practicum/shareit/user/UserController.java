@@ -21,35 +21,34 @@ public class UserController {
     }
 
     @PostMapping
-    public UserDto createUser(@Valid @RequestBody UserDto userDto){
+    public UserDto createUser(@Valid @RequestBody UserDto userDto) {
         log.info("Проверка контроллера метода createUser userDto {}", userDto);
         return userService.createUser(userDto);
     }
 
     @PatchMapping("/{userId}")
     public UserDto updateUser(@RequestBody UserDto userDto,
-                              @PathVariable long userId){
+                              @PathVariable long userId) {
         log.info("Проверка контроллера метода updateUser userDto {}", userDto);
         log.info("Проверка контроллера метода updateUser userId {}", userId);
         return userService.updateUser(userDto, userId);
     }
 
     @GetMapping
-    public List<UserDto> getAllUsers(){
+    public List<UserDto> getAllUsers() {
         return userService.getAllUsers();
     }
 
     @GetMapping("/{userId}")
-    public UserDto getByIdUser(@PathVariable long userId){
+    public UserDto getByIdUser(@PathVariable long userId) {
         log.info("Проверка контроллера метода getByIdUser userId {}", userId);
 
         return userService.getByIdUser(userId);
     }
 
     @DeleteMapping("/{userId}")
-    public void deleteUserById(@PathVariable long userId){
+    public void deleteUserById(@PathVariable long userId) {
         log.info("Проверка контроллера метода deleteUserById userId {}", userId);
         userService.deleteUserById(userId);
     }
-
 }

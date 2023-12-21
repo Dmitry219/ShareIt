@@ -15,7 +15,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import ru.practicum.shareit.item.ItemController;
 import ru.practicum.shareit.item.ItemService;
 import ru.practicum.shareit.item.dto.ItemDto;
-import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.UserController;
 import ru.practicum.shareit.user.UserService;
 import ru.practicum.shareit.user.dto.UserDto;
@@ -40,7 +39,6 @@ public class ItemControllerTest {
     ItemController itemController;
     @Autowired
     ItemService itemService;
-    Item item;
     ItemDto itemDto;
     ItemDto itemDto1;
     ItemDto itemDto2;
@@ -53,8 +51,9 @@ public class ItemControllerTest {
     String itemJsonString;
     String itemJsonString1;
     TestRestTemplate restTemplate;
+
     @BeforeEach
-    void create() throws JsonProcessingException {
+    void create() throws JsonProcessingException{ //был пробел перед {
         itemDto = ItemDto.builder()
                 .name("IIIrrr")
                 .description("iiiQQQRrR")
