@@ -31,7 +31,7 @@ public class UserRepository {
 
     public User updateUser(User user) {
         log.info("Проверка репозитория метод updateUser user{}", user);
-        if (!storageUser.containsKey(user.getId())){
+        if (!storageUser.containsKey(user.getId())) {
             return null;
         }
         storageUser.put(user.getId(), user);

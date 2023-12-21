@@ -82,7 +82,7 @@ public class ItemSrviceImpl implements ItemService {
     public List<ItemDto> getListItemsByIdUser(long userId) {
         return itemRepository.getStorageItem().stream()
                 .filter(item -> item.getOwner().equals(userId))
-                .map(itemMapping :: mapToItemDto )
+                .map(itemMapping :: mapToItemDto)
                 .collect(Collectors.toList());
     }
 

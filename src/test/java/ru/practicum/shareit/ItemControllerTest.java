@@ -53,7 +53,7 @@ public class ItemControllerTest {
     TestRestTemplate restTemplate;
 
     @BeforeEach
-    void create() throws JsonProcessingException{ //был пробел перед {
+    void create() throws JsonProcessingException {
         itemDto = ItemDto.builder()
                 .name("IIIrrr")
                 .description("iiiQQQRrR")
