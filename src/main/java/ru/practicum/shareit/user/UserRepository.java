@@ -1,6 +1,5 @@
 package ru.practicum.shareit.user;
 
-import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 
@@ -10,7 +9,6 @@ import java.util.Map;
 
 @Repository
 @Slf4j
-@Data
 public class UserRepository {
     private final Map<Long, User> storageUser = new HashMap<>();
     private long generateId = 0;

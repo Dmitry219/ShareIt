@@ -80,7 +80,7 @@ public class ItemSrviceImpl implements ItemService {
 
     @Override
     public List<ItemDto> getListItemsByIdUser(long userId) {
-        return itemRepository.getStorageItem().stream()
+        return itemRepository.getStorageItems().stream()
                 .filter(item -> item.getOwner().equals(userId))
                 .map(itemMapping::mapToItemDto)
                 .collect(Collectors.toList());
@@ -92,7 +92,7 @@ public class ItemSrviceImpl implements ItemService {
         if (text.isBlank()) {
             return new ArrayList<>();
         }
-        return itemRepository.getStorageItem().stream()
+        return itemRepository.getStorageItems().stream()
                 .filter(item -> item.getDescription().toLowerCase().contains(text.toLowerCase()) &&
                         item.getAvailable().equals(true))
                 .map(itemMapping::mapToItemDto)

@@ -1,6 +1,5 @@
 package ru.practicum.shareit.item;
 
-import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 import ru.practicum.shareit.item.model.Item;
@@ -10,7 +9,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Repository
-@Data
 @Slf4j
 public class ItemRepository {
     private final Map<Long, Item> storageItems = new HashMap<>();
@@ -20,7 +18,7 @@ public class ItemRepository {
         return ++generateId;
     }
 
-    public Collection<Item> getStorageItem() {
+    public Collection<Item> getStorageItems() {
         return storageItems.values();
     }
 

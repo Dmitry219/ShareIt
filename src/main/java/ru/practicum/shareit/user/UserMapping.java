@@ -1,9 +1,9 @@
 package ru.practicum.shareit.user;
 
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 import ru.practicum.shareit.user.dto.UserDto;
 
-@Service
+@Component
 public class UserMapping {
     //из entity в dto
     public UserDto mapToUserDto(User user) {
