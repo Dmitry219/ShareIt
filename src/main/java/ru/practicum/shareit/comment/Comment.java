@@ -1,4 +1,4 @@
-package ru.practicum.shareit.booking;
+package ru.practicum.shareit.comment;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -10,30 +10,24 @@ import ru.practicum.shareit.user.User;
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
-/**
- * TODO Sprint add-bookings.
- */
 @Entity
-@Table(name = "bookings", schema = "public")
+@Table(name = "comments", schema = "public")
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Booking {
+public class Comment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column(name = "start_date")
-    private LocalDateTime start;
-    @Column(name = "end_date")
-    private LocalDateTime end;
+    @Column(name = "text")
+    private String text;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "item_id", nullable = false)
-    private Item item;
+    private Item itemId;
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "booker_id", nullable = false)
-    private User booker;
-    @Column(name = "status")
-    private String status;
-
+    @JoinColumn(name = "author_id", nullable = false)
+    private User authorId;
+    @Column(name = "created")
+    private LocalDateTime created;
 }

@@ -6,7 +6,7 @@ import ru.practicum.shareit.user.dto.UserDto;
 @Component
 public class UserMapping {
     //из entity в dto
-    public UserDto mapToUserDto(User user) {
+    public static UserDto mapToUserDto(User user) {
         return UserDto.builder()
                 .id(user.getId())
                 .name(user.getName())
@@ -14,7 +14,7 @@ public class UserMapping {
                 .build();
     }
 
-    public User mapToUser(UserDto userDto) {
+    public static User mapToUser(UserDto userDto) {
         return User.builder()
                 .id(userDto.getId())
                 .name(userDto.getName())

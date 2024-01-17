@@ -51,6 +51,15 @@ public class ErrorHandler {
         );
     }
 
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponses handleValidationException(final IllegalArgumentException e) {
+        log.error("Произошла ошибка валидации {}", e.getMessage());
+        return new ErrorResponses(
+                String.format("%s", e.getMessage())
+        );
+    }
+
     @ExceptionHandler(value = {NotFoundException.class})
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ErrorResponses handleNullPointerException(final Exception e) {
