@@ -90,13 +90,11 @@ public class ItemSrviceImpl implements ItemService {
 
     @Override
     public ItemDto getByIdItem(long itemId, long userId) {
-        ItemDto itemDto = null;
         checkIdItem(itemId);
         checkIdUser(userId);
 
         Item item = itemRepository.getItemById(itemId);
 
-        List<Comment> commentDbs = new ArrayList<>();
         List<CommentDto> commentDtos = new ArrayList<>();
 
         BookingDtoShort lastBooking = null;
@@ -106,15 +104,11 @@ public class ItemSrviceImpl implements ItemService {
 
         if (item.getOwner().getId() == userId) {
 
-            commentDbs = commentRepository.getCommentByItemIdAndByOwnerId(itemId, userId);
+            commentDtos = commentRepository.getCommentByItemIdAndByOwnerId(itemId, userId).stream()
+                    .map(CommentMapping::toCommentDto)
+                    .collect(Collectors.toList());
 
-            if (!commentDbs.isEmpty()) {
-                commentDtos = commentDbs.stream()
-                        .map(CommentMapping::toCommentDto)
-                        .collect(Collectors.toList());
-            }
-
-            if (bookingRepository.findById(itemId).isPresent()) {
+            if (bookingRepository.findFirstByItemId(itemId) != null) {
                 Booking bookingLast = bookingRepository.getLastBookigByItemIdStatusApproved(
                         item.getId(), LocalDateTime.now());
                 Booking bookingNext = bookingRepository.getNextBookigByItemIdStatusApproved(
@@ -126,22 +120,14 @@ public class ItemSrviceImpl implements ItemService {
                 if (bookingNext != null) {
                     nextBooking = BookingMapping.toBookingDtoShort(bookingNext);
                 }
-                itemDto = ItemMapping.mapToItemDtoBookingByIdOwner(item, lastBooking, nextBooking, commentDtos);
-            } else {
-                itemDto = ItemMapping.mapToItemDtoBookingByIdOwner(item, lastBooking, nextBooking, commentDtos);
             }
+
         } else {
-
-            commentDbs = commentRepository.getCommentByItemIdAndByBookerId(itemId, userId);
-            if (!commentDbs.isEmpty()) {
-                commentDtos = commentDbs.stream()
-                        .map(CommentMapping::toCommentDto)
-                        .collect(Collectors.toList());
-            }
-
-            itemDto = ItemMapping.mapToItemDtoBookingByIdOwner(item, lastBooking, nextBooking, commentDtos);
+            commentDtos = commentRepository.getCommentByItemIdAndByBookerId(itemId, userId).stream()
+                    .map(CommentMapping::toCommentDto)
+                    .collect(Collectors.toList());;
         }
-        return itemDto;
+        return ItemMapping.mapToItemDtoBookingByIdOwner(item, lastBooking, nextBooking, commentDtos);
     }
 
     @Override
@@ -150,48 +136,35 @@ public class ItemSrviceImpl implements ItemService {
         List<Item> items = itemRepository.findAllByOwner_id(userId);
         List<ItemDto> newItems = new ArrayList<>();
 
-        List<Comment> commentDbs = new ArrayList<>();
-        List<CommentDto> commentDtos = new ArrayList<>();
+        List<CommentDto> commentDtos;
 
         for (Item item : items) {
             BookingDtoShort lastBooking = null;
             BookingDtoShort nextBooking = null;
             if (item.getOwner().getId() == userId) {
 
-                commentDbs = commentRepository.getCommentByItemIdAndByOwnerId(item.getId(), userId);
+                commentDtos = commentRepository.getCommentByItemIdAndByOwnerId(item.getId(), userId).stream()
+                        .map(CommentMapping::toCommentDto)
+                        .collect(Collectors.toList());
 
-                if (!commentDbs.isEmpty()) {
-                    commentDtos = commentDbs.stream()
-                            .map(CommentMapping::toCommentDto)
-                            .collect(Collectors.toList());
-                }
-
-                if (bookingRepository.findById(item.getId()).isPresent()) {
+                if (bookingRepository.findFirstByItemId(item.getId()) != null) {
                     Booking bookingLast = bookingRepository.getLastBookigByItemIdStatusApproved(
                             item.getId(), LocalDateTime.now());
                     Booking bookingNext = bookingRepository.getNextBookigByItemIdStatusApproved(
                             item.getId(), LocalDateTime.now());
-                    if (bookingLast != null && bookingNext != null) {
+                    if (bookingLast != null) {
                         lastBooking = BookingMapping.toBookingDtoShort(bookingLast);
-                        nextBooking = BookingMapping.toBookingDtoShort(bookingNext);
-                        newItems.add(ItemMapping.mapToItemDtoBookingByIdOwner(item, lastBooking, nextBooking, commentDtos));
-                    } else {
-                        newItems.add(ItemMapping.mapToItemDtoBookingByIdOwner(item, lastBooking, nextBooking, commentDtos));
                     }
-                } else {
-                    newItems.add(ItemMapping.mapToItemDtoBookingByIdOwner(item, lastBooking, nextBooking, commentDtos));
+                    if (bookingNext != null) {
+                        nextBooking = BookingMapping.toBookingDtoShort(bookingNext);
+                    }
                 }
             } else {
-
-                commentDbs = commentRepository.getCommentByItemIdAndByBookerId(item.getId(), userId);
-                if (!commentDbs.isEmpty()) {
-                    commentDtos = commentDbs.stream()
-                            .map(CommentMapping::toCommentDto)
-                            .collect(Collectors.toList());
-                }
-
-                newItems.add(ItemMapping.mapToItemDtoBookingByIdOwner(item, lastBooking, nextBooking, commentDtos));
+                commentDtos = commentRepository.getCommentByItemIdAndByBookerId(item.getId(), userId).stream()
+                        .map(CommentMapping::toCommentDto)
+                        .collect(Collectors.toList());
             }
+            newItems.add(ItemMapping.mapToItemDtoBookingByIdOwner(item, lastBooking, nextBooking, commentDtos));
         }
         return newItems;
     }

@@ -8,6 +8,8 @@ import java.util.List;
 
 public interface BookingRepository extends JpaRepository<Booking, Long> {
 
+    Booking findFirstByItemId(long itemId);
+
     @Query(value = "SELECT * FROM BOOKINGS b WHERE BOOKER_ID = ?1 ORDER BY ID DESC ;", nativeQuery = true)
     List<Booking> getListBookingsByBookerID(long userId);
 
