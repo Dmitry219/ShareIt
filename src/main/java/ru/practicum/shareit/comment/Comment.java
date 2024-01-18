@@ -22,10 +22,10 @@ public class Comment {
     private Long id;
     @Column(name = "text")
     private String text;
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "item_id", nullable = false)
     private Item itemId;
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "author_id", nullable = false)
     private User authorId;
     @Column(name = "created")

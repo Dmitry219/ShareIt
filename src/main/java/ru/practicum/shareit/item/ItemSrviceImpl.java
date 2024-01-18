@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.Booking;
 import ru.practicum.shareit.booking.BookingMapping;
 import ru.practicum.shareit.booking.BookingRepository;
@@ -27,6 +28,7 @@ import java.util.stream.Collectors;
 
 @Service
 @Slf4j
+@Transactional(readOnly = true)
 public class ItemSrviceImpl implements ItemService {
     private final UserRepository userRepository;
     private final ItemRepository itemRepository;
@@ -41,6 +43,7 @@ public class ItemSrviceImpl implements ItemService {
         this.commentRepository = commentRepository;
     }
 
+    @Transactional
     @Override
     public ItemDto createItem(ItemDto itemDto, long userId) {
         log.info("Проверка сервис метод createItem itemDto {}", itemDto);
@@ -54,6 +57,7 @@ public class ItemSrviceImpl implements ItemService {
         return ItemMapping.mapToItemDto(item);
     }
 
+    @Transactional
     @Override
     public ItemDto updateItem(ItemDto itemDto, long itemId, long userId) {
         log.info("Проверка сервис метод updateItem itemDto {}", itemDto);
@@ -182,6 +186,7 @@ public class ItemSrviceImpl implements ItemService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional
     @Override
     public CommentDto createComment(CommentDto commentDto, long bookerId, long itemId) {
         log.info("Проверка сервис метод createComment проверка commentDto={} , bookerId={} , itemId={} - ", commentDto, bookerId, itemId);

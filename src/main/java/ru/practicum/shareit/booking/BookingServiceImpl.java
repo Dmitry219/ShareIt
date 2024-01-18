@@ -2,6 +2,7 @@ package ru.practicum.shareit.booking;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.dto.BookingDtoRequest;
 import ru.practicum.shareit.booking.dto.BookingDtoResponse;
 import ru.practicum.shareit.exception.NotFoundException;
@@ -16,6 +17,7 @@ import java.util.stream.Collectors;
 
 @Service
 @Slf4j
+@Transactional(readOnly = true)
 public class BookingServiceImpl implements BookingService {
     private final BookingRepository bookingRepository;
     private final ItemRepository itemRepository;
@@ -28,6 +30,7 @@ public class BookingServiceImpl implements BookingService {
         this.userRepository = userRepository;
     }
 
+    @Transactional
     @Override
     public BookingDtoResponse createBooking(BookingDtoRequest bookingDtoRequest, long userId) {
         log.info("Проерка сервиса метода createBooking bookingDto {}", bookingDtoRequest);
@@ -45,6 +48,7 @@ public class BookingServiceImpl implements BookingService {
         return BookingMapping.toBookingResponseGetItemName(bookingRepository.save(booking));
     }
 
+    @Transactional
     @Override
     public BookingDtoResponse updateBooking(long bookingId, Boolean approved, long userId) {
 
