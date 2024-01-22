@@ -3,7 +3,8 @@ package ru.practicum.shareit.user;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import ru.practicum.shareit.exception.ValidationExceptionDuplicate;
+import org.springframework.transaction.annotation.Transactional;
+import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.user.dto.UserDto;
 
 import java.util.List;
@@ -11,71 +12,72 @@ import java.util.stream.Collectors;
 
 @Service
 @Slf4j
+@Transactional(readOnly = true)
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
-    private final UserMapping userMapping;
 
-    public UserServiceImpl(UserRepository userRepository, UserMapping userMapping) {
+    public UserServiceImpl(UserRepository userRepository) {
         this.userRepository = userRepository;
-        this.userMapping = userMapping;
     }
 
+    @Transactional
     @Override
     public UserDto createUser(UserDto userDto) {
         log.info("Проерка сервиса метода createUser userDto {}", userDto);
-        User user = userRepository.createUser(emailDuplicationCheckUser(userMapping.mapToUser(userDto)));
-        return userMapping.mapToUserDto(user);
+
+        User user = userRepository.save(UserMapping.mapToUser(userDto));
+        return UserMapping.mapToUserDto(user);
     }
 
+    @Transactional
     @Override
     public UserDto updateUser(UserDto userDto, long userId) {
         log.info("Проерка сервиса метода createUser userDto {}", userDto);
         log.info("Проерка сервиса метода createUser userId {}", userId);
 
-        User user = userMapping.mapToUser(userDto);
+        User user = UserMapping.mapToUser(userDto);
         user.setId(userId);
         if (user.getEmail() == null) {
-            user.setEmail(userRepository.getByIdUser(userId).getEmail());
+            user.setEmail(userRepository.getById(userId).getEmail());
         } else if (user.getName() == null) {
-            if (user.getEmail().equals(userRepository.getByIdUser(userId).getEmail())) {
-                log.info("если email равны {}, {}", user.getEmail(), userRepository.getByIdUser(userId).getEmail());
-                user.setName(userRepository.getByIdUser(userId).getName());
-            } else if (!user.getEmail().equals(userRepository.getByIdUser(userId).getEmail())) {
+            if (user.getEmail().equals(userRepository.getById(userId).getEmail())) {
+                log.info("если email равны {}, {}", user.getEmail(), userRepository.getById(userId).getEmail());
+                user.setName(userRepository.getById(userId).getName());
+            } else if (!user.getEmail().equals(userRepository.getById(userId).getEmail())) {
                 log.info("Попал в последнюю проверку где email не != {}, {}",
-                        user.getEmail(), userRepository.getByIdUser(userId).getEmail());
-                emailDuplicationCheckUser(user).setName(userRepository.getByIdUser(userId).getName());
-                user.setName(userRepository.getByIdUser(userId).getName());
+                        user.getEmail(), userRepository.getById(userId).getEmail());
+                user.setName(userRepository.getById(userId).getName());
             }
         }
-        User newUser = userRepository.updateUser(user);
-        return userMapping.mapToUserDto(newUser);
+
+        User newUser = userRepository.save(user);
+        return UserMapping.mapToUserDto(newUser);
     }
 
     @Override
     public List<UserDto> getAllUsers() {
-        return userRepository.getStorageUser().stream()
-                .map(userMapping::mapToUserDto)
+        return userRepository.findAll().stream()
+                .map(UserMapping::mapToUserDto)
                 .collect(Collectors.toList());
     }
 
     @Override
     public UserDto getByIdUser(long userId) {
-        return userMapping.mapToUserDto(userRepository.getByIdUser(userId));
+        checkId(userId);
+        return UserMapping.mapToUserDto(userRepository.getById(userId));
     }
 
+    @Transactional
     @Override
     public void deleteUserById(long userId) {
-        userRepository.deleteUserById(userId);
+        userRepository.deleteById(userId);
     }
 
-
-    public User emailDuplicationCheckUser(User user) {
-        for (User value : userRepository.getStorageUser()) {
-            if (value.getEmail().equals(user.getEmail())) {
-                log.info("Дублирование email");
-                throw new ValidationExceptionDuplicate(" email. Пользователь стаким email уже существует!");
-            }
+    public void checkId(long id) {
+        if (id <= 0) {
+            throw new NotFoundException("UserId не может быть меньше нуля или равен нулю!");
+        } else if (!userRepository.existsById(id)) {
+            throw new NotFoundException("Пользователь с таким Id не существует!");
         }
-        return user;
     }
 }
