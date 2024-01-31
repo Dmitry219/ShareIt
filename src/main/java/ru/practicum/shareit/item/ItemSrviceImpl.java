@@ -55,7 +55,7 @@ public class ItemSrviceImpl implements ItemService {
 
         Item item = ItemMapping.mapToItem(itemDto);
 
-        if(itemDto.getRequestId() != null){
+        if (itemDto.getRequestId() != null) {
             item.setRequestId(itemRequestRepository.findById(itemDto.getRequestId()).get());
         }
 
@@ -65,7 +65,7 @@ public class ItemSrviceImpl implements ItemService {
         log.info("Проверка сервис метод createItem item {}", item);
         log.info("Проврка сервиса метод createItem проверяем хранилище {}", itemRepository.getById(item.getId()));
         ItemDto itemDtoNew = ItemMapping.mapToItemDto(item);
-        if (item.getRequestId() != null){
+        if (item.getRequestId() != null) {
             itemDtoNew.setRequestId(item.getRequestId().getId());
         }
         return itemDtoNew;
@@ -93,7 +93,7 @@ public class ItemSrviceImpl implements ItemService {
         if (itemDto.getDescription() != null) {
             newItem.setDescription(itemDto.getDescription());
         }
-        if(itemDto.getAvailable() != null){
+        if (itemDto.getAvailable() != null) {
             newItem.setAvailable(itemDto.getAvailable());
         }
 

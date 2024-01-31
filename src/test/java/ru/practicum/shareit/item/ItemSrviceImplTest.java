@@ -65,7 +65,7 @@ class ItemSrviceImplTest {
     private Comment comment;
 
     @BeforeEach
-    public void setUp(){
+    public void setUp() {
 
         ownerDto = UserDto.builder()
                 .id(1L)

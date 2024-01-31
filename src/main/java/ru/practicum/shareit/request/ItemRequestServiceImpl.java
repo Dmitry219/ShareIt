@@ -9,7 +9,6 @@ import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.exception.ValidationUserException;
 import ru.practicum.shareit.item.ItemMapping;
 import ru.practicum.shareit.item.ItemRepository;
-import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.model.ItemDbForRequest;
 import ru.practicum.shareit.request.dto.ItemReqListItemsDto;
 import ru.practicum.shareit.request.dto.ItemRequestDto;
@@ -23,7 +22,7 @@ import java.util.stream.Collectors;
 @Service
 @Slf4j
 @Transactional(readOnly = true)
-public class ItemRequestServiceImpl implements ItemRequestService{
+public class ItemRequestServiceImpl implements ItemRequestService {
     private final ItemRequestRepository itemRequestRepository;
     private final ItemRepository itemRepository;
     private final UserRepository userRepository;
@@ -37,7 +36,7 @@ public class ItemRequestServiceImpl implements ItemRequestService{
 
     @Transactional
     @Override
-    public ItemRequestDto createItemRequest(ItemRequestDto itemRequestDto, Long userId){
+    public ItemRequestDto createItemRequest(ItemRequestDto itemRequestDto, Long userId) {
         log.info("Проверка сервис метод createItemRequest itemRequestDto {}", itemRequestDto);
         log.info("Проверка сервис метод createItemRequest userId {}", userId);
         checkIdUser(userId);
@@ -47,24 +46,24 @@ public class ItemRequestServiceImpl implements ItemRequestService{
     }
 
     @Override
-    public List<ItemReqListItemsDto> getListItemRequestDtoByIdUser(long requestorId){
+    public List<ItemReqListItemsDto> getListItemRequestDtoByIdUser(long requestorId) {
         checkIdUser(requestorId);
         List<ItemReqListItemsDto> itemReqListItemsDto = new ArrayList<>();
         List<ItemRequest> itemRequest = itemRequestRepository.findAllByRequestorId(requestorId);
         log.info("Проверка сервис метод getListItemRequestDtoByIdUser itemRequest {}", itemRequest);
 
-        if (!itemRequest.isEmpty()){
+        if (!itemRequest.isEmpty()) {
             for (ItemRequest request : itemRequest) {
                 List<ItemDbForRequest> items = itemRepository.getAllItemsByRequestId(request.getId()).stream()
                         .map(ItemMapping::mapToItemDbForRequest)
                         .collect(Collectors.toList());
                 log.info("Проверка сервис метод getListItemRequestDtoByIdUser items {}", items);
 
-                    if(!items.isEmpty()){
+                    if (!items.isEmpty()) {
                         ItemReqListItemsDto itemReqListItemsDtoNew = ItemRequestMapping.mapToItemReqListItemsDto(request, items);
                         log.info("Проверка сервис метод getListItemRequestDtoByIdUser itemReqListItemsDtoNew {}", itemReqListItemsDtoNew);
                         itemReqListItemsDto.add(itemReqListItemsDtoNew);
-                    }else {
+                    } else {
                         ItemReqListItemsDto itemReqListItemsDtoNew = ItemRequestMapping.mapToItemReqListItemsDto(request, items);
                         itemReqListItemsDto.add(itemReqListItemsDtoNew);
                     }

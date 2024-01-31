@@ -1,6 +1,5 @@
 package ru.practicum.shareit.booking;
 
-import com.fasterxml.jackson.core.JsonToken;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +18,7 @@ public class BookingCreateRequestJsonTest {
 
     @Test
     @SneakyThrows
-    void testsSerialize(){
+    void testsSerialize() {
         BookingDtoRequest bookingDtoRequest = BookingDtoRequest.builder()
                 .itemId(1L)
                 .start(LocalDateTime.now())

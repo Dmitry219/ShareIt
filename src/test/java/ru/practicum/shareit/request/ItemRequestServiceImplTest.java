@@ -16,7 +16,6 @@ import ru.practicum.shareit.user.User;
 import ru.practicum.shareit.user.UserRepository;
 import ru.practicum.shareit.user.UserService;
 import ru.practicum.shareit.user.dto.UserDto;
-import org.springframework.data.domain.Pageable;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -52,7 +51,8 @@ class ItemRequestServiceImplTest {
     private ItemRequest itemRequest;
 
     @BeforeEach
-    public void setUp(){
+    public void setUp() {
+
         ownerDto = UserDto.builder()
                 .id(1L)
                 .name("owner")

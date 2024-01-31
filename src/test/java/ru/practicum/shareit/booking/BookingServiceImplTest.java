@@ -6,7 +6,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.TestPropertySource;
 import ru.practicum.shareit.booking.dto.BookingDtoRequest;
 import ru.practicum.shareit.booking.dto.BookingDtoResponse;
@@ -14,7 +13,6 @@ import ru.practicum.shareit.booking.dto.BookingDtoShort;
 import ru.practicum.shareit.comment.Comment;
 import ru.practicum.shareit.comment.CommentDto;
 import ru.practicum.shareit.exception.NotFoundException;
-import ru.practicum.shareit.exception.ValidationUserException;
 import ru.practicum.shareit.item.ItemRepository;
 import ru.practicum.shareit.item.ItemService;
 import ru.practicum.shareit.item.dto.ItemDto;
@@ -70,7 +68,7 @@ class BookingServiceImplTest {
     private BookingDtoResponse bookingDtoResponse;
 
     @BeforeEach
-    public void setUp(){
+    public void setUp() {
 
         ownerDto = UserDto.builder()
                 .id(1L)
@@ -230,7 +228,8 @@ class BookingServiceImplTest {
     void getAllBookingsBookerByIdAndStatesByTrue() {
         when(userRepository.existsById(anyLong())).thenReturn(true);
 
-        List<BookingDtoResponse> bookings = bookingService.getAllBookingsBookerByIdAndStatesBy( "ALL",1L,1, 2);
+        List<BookingDtoResponse> bookings = bookingService
+                .getAllBookingsBookerByIdAndStatesBy("ALL",1L,1, 2);
         assertEquals(bookings.size(), 0);
     }
 
@@ -241,7 +240,8 @@ class BookingServiceImplTest {
         when(bookingRepository.findAllByItemOwnerIdOrderByIdDesc(anyLong(), any()))
                 .thenReturn(List.of(booking));
 
-        List<BookingDtoResponse> bookings = bookingService.getAllBookingsOwnerById("ALL", 1L ,1, 10);
+        List<BookingDtoResponse> bookings = bookingService
+                .getAllBookingsOwnerById("ALL", 1L,1, 10);
         assertEquals(bookings.size(), 1);
         assertEquals(bookings.get(0).getId(), bookingDtoResponse.getId());
     }

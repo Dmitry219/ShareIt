@@ -17,7 +17,7 @@ public class UserCreateRequestJsonTest {
 
     @Test
     @SneakyThrows
-    void testSerialize(){
+    void testSerialize() {
         UserDto userDto = UserDto.builder()
                 .id(1L)
                 .name("nnn")

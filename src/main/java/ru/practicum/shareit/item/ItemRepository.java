@@ -5,7 +5,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import ru.practicum.shareit.item.model.Item;
-import ru.practicum.shareit.request.ItemRequest;
 
 import java.util.List;
 
@@ -17,6 +16,7 @@ public interface ItemRepository extends JpaRepository<Item, Long> {
 
     @Query(value = "select i from Item i where lower(i.name) like lower(concat('%', ?1, '%')) or lower(i.description) like lower(concat('%', ?1, '%')) and i.available = TRUE")
     List<Item> findAllByText(String text, PageRequest pageRequest);
+
 //------------------------конец новой реализации
     List<Item> findAllByOwner_id(long userId, PageRequest pageRequest);
 

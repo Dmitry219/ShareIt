@@ -101,7 +101,7 @@ public class BookingServiceImpl implements BookingService {
         log.info("Проверка сервиса метода getAllBookingsBookerByIdAndStatesBy status {}", state);
 
         if (state.equals("ALL")) { //все
-            bookings = bookingRepository.findAllByBookerIdOrderByIdDesc(userId,PageRequest.of(from/size, size)).stream()
+            bookings = bookingRepository.findAllByBookerIdOrderByIdDesc(userId,PageRequest.of(from / size, size)).stream()
                     .map(BookingMapping::toBookingResponseGetItemName)
                     .collect(Collectors.toList());
         } else if (state.equals("CURRENT")) { //текущий
@@ -140,7 +140,7 @@ public class BookingServiceImpl implements BookingService {
         log.info("Проерка сервиса метода getAllBookingsOwnerById ownerId {}", ownerId);
 
         if (state.equals("ALL")) { //все
-            bookings = bookingRepository.findAllByItemOwnerIdOrderByIdDesc(ownerId,PageRequest.of(from/size, size)).stream()
+            bookings = bookingRepository.findAllByItemOwnerIdOrderByIdDesc(ownerId,PageRequest.of(from / size, size)).stream()
                     .map(BookingMapping::toBookingResponseGetItemName)
                     .collect(Collectors.toList());
         } else if (state.equals("CURRENT")) { //текущий
