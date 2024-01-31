@@ -6,6 +6,7 @@ import ru.practicum.shareit.booking.dto.BookingDtoShort;
 import ru.practicum.shareit.comment.CommentDto;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.model.Item;
+import ru.practicum.shareit.item.model.ItemDbForRequest;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,7 +19,7 @@ public class ItemMapping {
         return ItemDto.builder()
                 .id(item.getId())
                 .name(item.getName())
-                .available(item.getAvailable())
+                .available(item.isAvailable())
                 .description(item.getDescription())
                 .comments(new ArrayList<>())
                 .build();
@@ -42,7 +43,7 @@ public class ItemMapping {
         return ItemDto.builder()
                 .id(item.getId())
                 .name(item.getName())
-                .available(item.getAvailable())
+                .available(item.isAvailable())
                 .description(item.getDescription())
                 .lastBooking(lastBooking)
                 .nextBooking(nextBooking)
@@ -50,14 +51,14 @@ public class ItemMapping {
                 .build();
     }
 
-    public static ItemDto mapToItemDtoBookingByIdUser(Item item, Booking booking) {
+    public static ItemDbForRequest mapToItemDbForRequest(Item item) {
 
-        return ItemDto.builder()
+        return ItemDbForRequest.builder()
                 .id(item.getId())
                 .name(item.getName())
-                .available(item.getAvailable())
                 .description(item.getDescription())
-                .comments(new ArrayList<>())
+                .available(item.isAvailable())
+                .requestId(item.getRequestId().getId())
                 .build();
     }
 

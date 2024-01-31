@@ -73,7 +73,7 @@ public class UserServiceImpl implements UserService {
         userRepository.deleteById(userId);
     }
 
-    public void checkId(long id) {
+    private void checkId(long id) {
         if (id <= 0) {
             throw new NotFoundException("UserId не может быть меньше нуля или равен нулю!");
         } else if (!userRepository.existsById(id)) {
