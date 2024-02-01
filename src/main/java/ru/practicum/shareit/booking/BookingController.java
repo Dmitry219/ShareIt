@@ -16,6 +16,7 @@ import java.util.List;
 @RequestMapping(path = "/bookings")
 @Slf4j
 public class BookingController {
+    private static final String X_SHARER_USER_ID = "X-Sharer-User-Id";
     private final BookingService bookingService;
 
     public BookingController(BookingService bookingService) {
@@ -24,7 +25,7 @@ public class BookingController {
 
     @PostMapping
     public BookingDtoResponse createBooking(@Valid @RequestBody BookingDtoRequest bookingDtoRequest,
-                                            @RequestHeader(value = "X-Sharer-User-Id") long userId) {
+                                            @RequestHeader(value = X_SHARER_USER_ID) long userId) {
         log.info("Проверка контроллера метода createBooking bookingDto {}", bookingDtoRequest);
         log.info("Проверка контроллера метода createBooking userId {}", userId);
         return bookingService.createBooking(bookingDtoRequest, userId);
@@ -33,7 +34,7 @@ public class BookingController {
     @PatchMapping("/{bookingId}")
     public BookingDtoResponse updateBooking(@PathVariable long bookingId,
                                  @RequestParam Boolean approved,
-                                 @RequestHeader(value = "X-Sharer-User-Id") long userId) {
+                                 @RequestHeader(value = X_SHARER_USER_ID) long userId) {
         log.info("Проверка контроллер метод updateBooking bookingId {}", bookingId);
         log.info("Проверка контроллер метод updateBooking approved {}", approved);
         log.info("Проверка контроллер метод updateBooking X-Sharer-User-Id {}", userId);
@@ -43,13 +44,13 @@ public class BookingController {
 
     @GetMapping("/{bookingId}")
     public BookingDtoResponse getBookingByIdByUserId(@PathVariable long bookingId,
-                                                   @RequestHeader("X-Sharer-User-Id") long userId) {
+                                                   @RequestHeader(X_SHARER_USER_ID) long userId) {
         return bookingService.getBookingByIdByUserId(bookingId,userId);
     }
 
     @GetMapping
     public List<BookingDtoResponse> getAllBookingsBookerByIdAndStatesBy(@RequestParam (defaultValue = "ALL") String state,
-                                                                        @RequestHeader("X-Sharer-User-Id") long userId,
+                                                                        @RequestHeader(X_SHARER_USER_ID) long userId,
                                                                         @RequestParam(value = "from", defaultValue = "0") @Positive int from,
                                                                         @RequestParam(value = "size", defaultValue = "10") @Positive int size) {
         log.info("Проверка контроллер метод getAllBookingsBookerByIdAndStatesBy - status {}", state);
@@ -59,7 +60,7 @@ public class BookingController {
 
     @GetMapping("/owner")
     public List<BookingDtoResponse> getAllBookingsOwnerById(@RequestParam (defaultValue = "ALL") String state,
-                                                            @RequestHeader("X-Sharer-User-Id") long userId,
+                                                            @RequestHeader(X_SHARER_USER_ID) long userId,
                                                             @RequestParam(value = "from", defaultValue = "0") @Positive int from,
                                                             @RequestParam(value = "size", defaultValue = "10") @Positive int size) {
         return bookingService.getAllBookingsOwnerById(state,userId,from,size);
