@@ -1,6 +1,7 @@
 package ru.practicum.shareit.booking;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.dto.BookingDtoRequest;
@@ -35,6 +36,7 @@ public class BookingServiceImpl implements BookingService {
     public BookingDtoResponse createBooking(BookingDtoRequest bookingDtoRequest, long userId) {
         log.info("Проерка сервиса метода createBooking bookingDto {}", bookingDtoRequest);
         log.info("Проерка сервиса метода createBooking userId {}", userId);
+
         checkIdItem(bookingDtoRequest);
         checkIdUser(userId);
         checkIdOwnerByUserId(bookingDtoRequest, userId);
@@ -51,11 +53,15 @@ public class BookingServiceImpl implements BookingService {
     @Transactional
     @Override
     public BookingDtoResponse updateBooking(long bookingId, Boolean approved, long userId) {
+        log.info("Проерка сервиса метода updateBooking bookingId {}", bookingId);
+        log.info("Проерка сервиса метода updateBooking approved {}", approved);
+        log.info("Проерка сервиса метода updateBooking userId {}", userId);
 
-        Booking booking = bookingRepository.findById(bookingId).get();
-        log.info("Проерка сервиса метода updateBooking booking {}", booking);
         checkIdBooking(bookingId);
+
         checkIdOwner(bookingId, userId);
+        Booking booking = bookingRepository.getBookingById(bookingId);
+        log.info("Проерка сервиса метода updateBooking booking {}", booking);
 
         if (!booking.getStatus().equals(String.valueOf(StatusType.APPROVED))) {
             if (approved.equals(true)) {
@@ -87,34 +93,35 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public List<BookingDtoResponse> getAllBookingsBookerByIdAndStatesBy(String state, long userId) {
+    public List<BookingDtoResponse> getAllBookingsBookerByIdAndStatesBy(String state, long userId, int from, int size) {
         checkIdUser(userId);
+        PageRequest pageRequest = PageRequest.of(from, size);
         LocalDateTime localDateTimeNow = LocalDateTime.now();
         List<BookingDtoResponse> bookings = new ArrayList<>();
         log.info("Проверка сервиса метода getAllBookingsBookerByIdAndStatesBy status {}", state);
 
         if (state.equals("ALL")) { //все
-            bookings = bookingRepository.getListBookingsByBookerID(userId).stream()
+            bookings = bookingRepository.findAllByBookerIdOrderByIdDesc(userId,PageRequest.of(from / size, size)).stream()
                     .map(BookingMapping::toBookingResponseGetItemName)
                     .collect(Collectors.toList());
         } else if (state.equals("CURRENT")) { //текущий
-            bookings = bookingRepository.getListBookingCurrentDateTimeByBookerId(localDateTimeNow, userId).stream()
+            bookings = bookingRepository.findAllByBookerIdAndStartBeforeAndEndAfterOrderById(userId, localDateTimeNow, localDateTimeNow, pageRequest).stream()
                     .map(BookingMapping::toBookingResponseGetItemName)
                     .collect(Collectors.toList());
         } else if (state.equals("PAST")) { //прошлое
-            bookings = bookingRepository.getListBookingPastDateTimeByBookerId(localDateTimeNow, userId).stream()
+            bookings = bookingRepository.findAllByBookerIdAndEndBeforeOrderByStartDesc(userId, localDateTimeNow, pageRequest).stream()
                     .map(BookingMapping::toBookingResponseGetItemName)
                     .collect(Collectors.toList());
         } else if (state.equals("FUTURE")) { //будущее
-            bookings = bookingRepository.getListBookingFutureDateTimeByBookerId(localDateTimeNow,userId).stream()
+            bookings = bookingRepository.findAllByBookerIdAndStartAfterAndEndAfterOrderByIdDesc(userId, localDateTimeNow, localDateTimeNow, pageRequest).stream()
                     .map(BookingMapping::toBookingResponseGetItemName)
                     .collect(Collectors.toList());
         } else if (state.equals("WAITING")) { //ожидающий WAITING
-            bookings = bookingRepository.getListBookingsByWaityng(state, userId).stream()
+            bookings = bookingRepository.findAllByBookerIdAndStatus(userId, state, pageRequest).stream()
                     .map(BookingMapping::toBookingResponseGetItemName)
                     .collect(Collectors.toList());
         } else if (state.equals("REJECTED")) { //отклонённый REJECTED
-            bookings = bookingRepository.getListBookingsByRejected(state, userId).stream()
+            bookings = bookingRepository.findAllByBookerIdAndStatus(userId, state, pageRequest).stream()
                     .map(BookingMapping::toBookingResponseGetItemName)
                     .collect(Collectors.toList());
         } else { //UNSUPPORTED_STATUS
@@ -124,36 +131,36 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public List<BookingDtoResponse> getAllBookingsOwnerById(String state, long ownerId) {
+    public List<BookingDtoResponse> getAllBookingsOwnerById(String state, long ownerId,int from, int size) {
         checkIdUser(ownerId);
         LocalDateTime localDateTimeNow = LocalDateTime.now();
         List<BookingDtoResponse> bookings = new ArrayList<>();
-
+        PageRequest pageRequest = PageRequest.of(from, size);
         log.info("Проерка сервиса метода getAllBookingsOwnerById status {}", state);
         log.info("Проерка сервиса метода getAllBookingsOwnerById ownerId {}", ownerId);
 
         if (state.equals("ALL")) { //все
-            bookings = bookingRepository.getListBookingByOwnerID(ownerId).stream()
+            bookings = bookingRepository.findAllByItemOwnerIdOrderByIdDesc(ownerId,PageRequest.of(from / size, size)).stream()
                     .map(BookingMapping::toBookingResponseGetItemName)
                     .collect(Collectors.toList());
         } else if (state.equals("CURRENT")) { //текущий
-            bookings = bookingRepository.getListBookingCurrentDateTimeByOwnerId(localDateTimeNow, ownerId).stream()
+            bookings = bookingRepository.findAllByItemOwnerIdAndStartBeforeAndEndAfterOrderById(ownerId,localDateTimeNow,localDateTimeNow,pageRequest).stream()
                     .map(BookingMapping::toBookingResponseGetItemName)
                     .collect(Collectors.toList());
         } else if (state.equals("PAST")) { //прошлое
-            bookings = bookingRepository.getListBookingPastDateTimeByOwnerId(localDateTimeNow, ownerId).stream()
+            bookings = bookingRepository.findAllByItemOwnerIdAndEndBeforeOrderByStartDesc(ownerId,localDateTimeNow,pageRequest).stream()
                     .map(BookingMapping::toBookingResponseGetItemName)
                     .collect(Collectors.toList());
         } else if (state.equals("FUTURE")) { //будущее
-            bookings = bookingRepository.getListBookingFutureDateTimeByOwnerId(localDateTimeNow,ownerId).stream()
+            bookings = bookingRepository.findAllByItemOwnerIdAndStartAfterAndEndAfterOrderByIdDesc(ownerId,localDateTimeNow,localDateTimeNow,pageRequest).stream()
                     .map(BookingMapping::toBookingResponseGetItemName)
                     .collect(Collectors.toList());
         } else if (state.equals("WAITING")) { //ожидающий WAITING
-            bookings = bookingRepository.getListBookingWaityngByOwnerId(state, ownerId).stream()
+            bookings = bookingRepository.findAllByItemOwnerIdAndStatus(ownerId,state,pageRequest).stream()
                     .map(BookingMapping::toBookingResponseGetItemName)
                     .collect(Collectors.toList());
         } else if (state.equals("REJECTED")) { //отклонённый REJECTED
-            bookings = bookingRepository.getListBookingRejectedByOwnerId(state, ownerId).stream()
+            bookings = bookingRepository.findAllByItemOwnerIdAndStatus(ownerId,state,pageRequest).stream()
                     .map(BookingMapping::toBookingResponseGetItemName)
                     .collect(Collectors.toList());
         } else { //UNSUPPORTED_STATUS
@@ -208,7 +215,7 @@ public class BookingServiceImpl implements BookingService {
     private void checkItemIdForAvailability(BookingDtoRequest bookingDtoRequest) {
         log.info("Проверка сервис метод checkItemIdForAvailability ДОСТУПНОСТИ");
 
-        if (!itemRepository.getById(bookingDtoRequest.getItemId()).getAvailable()) {
+        if (!itemRepository.getById(bookingDtoRequest.getItemId()).isAvailable()) {
             log.info("Проверка сервис метод checkItemIdForAvailability проверка ДОСТУПНОСТИ вещи");
             throw new ValidationUserException("Вещь не доступна!");
         }
@@ -233,7 +240,7 @@ public class BookingServiceImpl implements BookingService {
     private void checkIdOwnerByUserId(BookingDtoRequest bookingDtoRequest, long userId) {
         log.info("Проверка сервис метод checkIdOwner проверка что ID USER не является владельцем");
 
-        if (itemRepository.findById(bookingDtoRequest.getItemId()).get().getOwner().getId().equals(userId)) {
+        if (itemRepository.getItemById(bookingDtoRequest.getItemId()).getOwner().getId().equals(userId)) {
             throw new NotFoundException("userId владелец не может бронировать свою вещь!");
         }
     }

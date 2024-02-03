@@ -1,14 +1,10 @@
 package ru.practicum.shareit.comment;
 
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.User;
 
 import java.time.LocalDateTime;
 
-@Component
-@Slf4j
 public class CommentMapping {
 
     //метод конвертации bookingDtoRequest в Booking при создании и отправке в бд

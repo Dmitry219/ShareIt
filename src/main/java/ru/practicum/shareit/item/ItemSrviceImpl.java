@@ -2,6 +2,7 @@ package ru.practicum.shareit.item;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import org.springframework.transaction.annotation.Transactional;
@@ -18,6 +19,7 @@ import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.exception.ValidationUserException;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.model.Item;
+import ru.practicum.shareit.request.ItemRequestRepository;
 import ru.practicum.shareit.user.User;
 import ru.practicum.shareit.user.UserRepository;
 
@@ -34,13 +36,15 @@ public class ItemSrviceImpl implements ItemService {
     private final ItemRepository itemRepository;
     private final BookingRepository bookingRepository;
     private final CommentRepository commentRepository;
+    private final ItemRequestRepository itemRequestRepository;
 
     @Autowired
-    public ItemSrviceImpl(UserRepository userRepository, ItemRepository itemRepository, BookingRepository bookingRepository, CommentRepository commentRepository) {
+    public ItemSrviceImpl(UserRepository userRepository, ItemRepository itemRepository, BookingRepository bookingRepository, CommentRepository commentRepository, ItemRequestRepository itemRequestRepository) {
         this.userRepository = userRepository;
         this.itemRepository = itemRepository;
         this.bookingRepository = bookingRepository;
         this.commentRepository = commentRepository;
+        this.itemRequestRepository = itemRequestRepository;
     }
 
     @Transactional
@@ -48,13 +52,23 @@ public class ItemSrviceImpl implements ItemService {
     public ItemDto createItem(ItemDto itemDto, long userId) {
         log.info("Проверка сервис метод createItem itemDto {}", itemDto);
         log.info("Проверка сервис метод createItem item {}", userId);
+
         Item item = ItemMapping.mapToItem(itemDto);
+
+        if (itemDto.getRequestId() != null) {
+            item.setRequestId(itemRequestRepository.findById(itemDto.getRequestId()).get());
+        }
+
         checkIdUser(userId);
         item.setOwner(userRepository.findById(userId).get());
         itemRepository.save(item);
         log.info("Проверка сервис метод createItem item {}", item);
         log.info("Проврка сервиса метод createItem проверяем хранилище {}", itemRepository.getById(item.getId()));
-        return ItemMapping.mapToItemDto(item);
+        ItemDto itemDtoNew = ItemMapping.mapToItemDto(item);
+        if (item.getRequestId() != null) {
+            itemDtoNew.setRequestId(item.getRequestId().getId());
+        }
+        return itemDtoNew;
     }
 
     @Transactional
@@ -63,33 +77,27 @@ public class ItemSrviceImpl implements ItemService {
         log.info("Проверка сервис метод updateItem itemDto {}", itemDto);
         log.info("Проверка сервис метод updateItem itemId {}", itemId);
         log.info("Проверка сервис метод updateItem userId {}", userId);
-        log.info("Проверка сервис метод updateItem прорка правильной item {}", itemRepository.getById(itemId));
+        log.info("Проверка сервис метод updateItem прорка правильной item {}", itemDto);
 
         checkIdItem(itemId);
-        log.info("Проверка сервис метод updateItem проверка правильного user {}", userRepository.getById(userId));
+
         checkIdOwnerItem(itemId, userId);
         checkIdUser(userId);
 
-        Item item = ItemMapping.mapToItem(itemDto);
-        log.info("Проверка сервис метод updateItem item {}", item);
-        Item newItem = itemRepository.getById(itemId);
+        Item newItem = itemRepository.getReferenceById(itemId);
         log.info("Проверка сервис метод updateItem newItem {}", newItem);
 
-        if (item.getName() != null) {
-            newItem.setName(item.getName());
+        if (itemDto.getName() != null) {
+            newItem.setName(itemDto.getName());
         }
-        if (item.getDescription() != null) {
-            newItem.setDescription(item.getDescription());
+        if (itemDto.getDescription() != null) {
+            newItem.setDescription(itemDto.getDescription());
         }
-        if (item.getAvailable() != null) {
-            newItem.setAvailable(item.getAvailable());
+        if (itemDto.getAvailable() != null) {
+            newItem.setAvailable(itemDto.getAvailable());
         }
 
-        itemRepository.save(newItem);
-
-        log.info("Проверка сервиса метод updateItem проверка правильного хранилища {}",
-                itemRepository.getById(itemId));
-        return ItemMapping.mapToItemDto(newItem);
+        return ItemMapping.mapToItemDto(itemRepository.save(newItem));
     }
 
     @Override
@@ -135,9 +143,10 @@ public class ItemSrviceImpl implements ItemService {
     }
 
     @Override
-    public List<ItemDto> getListItemsByIdUser(long userId) {
+    public List<ItemDto> getListItemsByIdUser(long userId, int from, int size) {
         checkIdUser(userId);
-        List<Item> items = itemRepository.findAllByOwner_id(userId);
+        PageRequest pageRequest = PageRequest.of(from, size);
+        List<Item> items = itemRepository.findAllByOwner_id(userId, pageRequest);
         List<ItemDto> newItems = new ArrayList<>();
 
         List<CommentDto> commentDtos;
@@ -174,14 +183,13 @@ public class ItemSrviceImpl implements ItemService {
     }
 
     @Override
-    public List<ItemDto> getListItemsByText(String text, long userId) {
+    public List<ItemDto> getListItemsByText(String text, long userId, int from, int size) {
         log.info("Проверка сервис метод getListItemsByText проверка text {} , userId {}", text, userId);
         if (text.isBlank()) {
             return new ArrayList<>();
         }
-        return itemRepository.findAll().stream()
-                .filter(item -> item.getDescription().toLowerCase().contains(text.toLowerCase()) &&
-                        item.getAvailable().equals(true))
+        PageRequest pageRequest = PageRequest.of(from, size);
+        return itemRepository.findAllByText(text, pageRequest).stream()
                 .map(ItemMapping::mapToItemDto)
                 .collect(Collectors.toList());
     }
@@ -195,8 +203,10 @@ public class ItemSrviceImpl implements ItemService {
 
         User user = userRepository.findById(bookerId).get();
         Item item = itemRepository.findById(itemId).get();
+        log.info("Проверка сервис метод createComment проверка что дошли при тестировании до bookings");
         Booking bookings = bookingRepository
                 .getListBokingsByBookerIdAndByItemIdAndLessEndTime(bookerId, itemId);
+        log.info("Проверка сервис метод createComment проверка что прошли при тестировании до bookings");
 
         Comment comment = null;
         CommentDto commentDtoNew = null;
@@ -235,7 +245,7 @@ public class ItemSrviceImpl implements ItemService {
 
     private void checkIdOwnerItem(long itemId, long userId) {
         log.info("Проверка сервис метод checkIdOwnerItem проверка владельца");
-        if (itemRepository.getById(itemId).getOwner().getId() != userId) {
+        if (itemRepository.getItemById(itemId).getOwner().getId() != userId) {
             throw new AuthorizationFailureException("Вещь с таким ID имеет владельца!");
         }
     }
